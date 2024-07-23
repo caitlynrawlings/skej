@@ -2,8 +2,7 @@
 
 import * as React from 'react'
 import { useState, ChangeEvent } from 'react'
-import { 
-  ChakraProvider, 
+import {
   Flex, 
   Input,
   HStack,
@@ -13,19 +12,16 @@ import {
   Checkbox,
   Text,
   Select,
-  Button as ChakraButton,
+  Button,
   NumberInput,
   NumberInputField,
   NumberInputStepper,
   NumberIncrementStepper,
   NumberDecrementStepper,
 } from '@chakra-ui/react'
-import {Button, Calendar, CalendarCell, CalendarGrid, CalendarGridBody, CalendarGridHeader, CalendarHeaderCell, DateInput, DatePicker, DateSegment, Dialog, Group, Heading, Label, Popover} from 'react-aria-components';
-import type {ButtonProps, DateValue, PopoverProps} from 'react-aria-components';
-import ChevronUpDownIcon from '@spectrum-icons/workflow/ChevronUpDown';
-import ChevronLeftIcon from '@spectrum-icons/workflow/ChevronLeft';
-import ChevronRightIcon from '@spectrum-icons/workflow/ChevronRight';
-
+import CalendarDatePicker, { getDatesBetween } from '../components/CalendarDatePicker'
+import CalendarDateRangePicker from '../components/CalendarDateRangePicker'
+import { DateValue } from 'react-aria-components'
 
 export default function CreatePage() {
   const [eventType, setEventType] = useState<string>('specific')
@@ -35,33 +31,31 @@ export default function CreatePage() {
   }
 
   return (
-    <ChakraProvider>
-      <Flex flexDirection={'column'} p={4}>
-        <HStack spacing={4}>
-          <Text>Event Name: </Text>
-          <Input placeholder='New Event Name' size='md' />
-        </HStack>
-        <HStack spacing={4} mt={4}>
-          <Text>Select the type of event are you trying to schedule: </Text>
-          <Select value={eventType} onChange={handleSelectChange}>
-            <option value='specific'>Specific Dates</option>
-            <option value='general'>Days of Week</option>
-          </Select>
-        </HStack>
-        <HStack spacing={4} mt={4}>
-          <Text>Select the required minimum time block selection (minutes): </Text>
-          <NumberInput min={1} step={1} defaultValue={15}>
-            <NumberInputField />
-            <NumberInputStepper>
-              <NumberIncrementStepper />
-              <NumberDecrementStepper />
-            </NumberInputStepper>
-          </NumberInput>
-        </HStack>
-        {eventType === 'general' && <General />}
-        {eventType === 'specific' && <Specific />}
-      </Flex>
-    </ChakraProvider>
+    <Flex flexDirection={'column'} p={4}>
+      <HStack spacing={4}>
+        <Text>Event Name: </Text>
+        <Input placeholder='New Event Name' size='md' />
+      </HStack>
+      <HStack spacing={4} mt={4}>
+        <Text>Select the type of event are you trying to schedule: </Text>
+        <Select value={eventType} onChange={handleSelectChange}>
+          <option value='specific'>Specific Dates</option>
+          <option value='general'>Days of Week</option>
+        </Select>
+      </HStack>
+      <HStack spacing={4} mt={4}>
+        <Text>Select the required minimum time block selection (minutes): </Text>
+        <NumberInput min={1} step={1} defaultValue={15}>
+          <NumberInputField />
+          <NumberInputStepper>
+            <NumberIncrementStepper />
+            <NumberDecrementStepper />
+          </NumberInputStepper>
+        </NumberInput>
+      </HStack>
+      {eventType === 'general' && <General />}
+      {eventType === 'specific' && <Specific />}
+    </Flex>
   )
 }
 
@@ -103,9 +97,9 @@ function Specific() {
 
   return (
     <Box mt={4}>
-      <ChakraButton>Add date or date range</ChakraButton>
+      <Button>Add date or date range</Button>
 
-      <CalendarDatePicker/>
+      <DateRangePicker/>
 
       {selectedDays.map((day) => (
         <Day key={day} day={day} />
@@ -114,105 +108,48 @@ function Specific() {
   )
 }
 
-function CalendarDatePicker() {
-  const [selectedDate, setSelectedDate] = useState<DateValue | null>(null)
+function DateRangePicker() {
+  const [isRange, setIsRange] = useState<boolean>(false)
+  const [dateRange, setDateRange] = useState<DateRange | null>(null)
 
-  const handleDateChange = (date: DateValue) => {
-    setSelectedDate(date)
-    console.log(`Selected date: ${date}`)
+  const handleIsRangeChange = () => {
+    setIsRange(!isRange)
   }
 
+  const handleDateRangeChange = (sideOfRange: 'start' | 'end', date: DateValue) => {
+    setDateRange(prev => {
+      if (!prev) {
+        // Initialize dateRange if it was null
+        return {
+          start: date,
+          end: date
+        }
+      }
+      return {
+        ...prev,
+        [sideOfRange]: date
+      }
+    })
+  }
+
+  // Function to get all dates between start and end
+  const getDates = dateRange ? getDatesBetween(dateRange.start, dateRange.end) : [];
+
   return (
-    <DatePicker onChange={handleDateChange} className="group flex flex-col gap-1 w-[200px]">
-      <Label className="text-white cursor-default">
-        Date
-      </Label>
-      <Group className="flex rounded-lg bg-white/90 focus-within:bg-white group-open:bg-white transition pl-3 shadow-md text-gray-700 focus-visible:ring-2 ring-black">
-        <DateInput className="flex flex-1 py-2">
-          {(segment) => (
-            <DateSegment
-              segment={segment}
-              className="px-0.5 tabular-nums outline-none rounded-sm focus:bg-violet-700 focus:text-white caret-transparent placeholder-shown:italic"
-            />
-          )}
-        </DateInput>
-        <Button className="ml-2 mr-2 w-5 h-9 outline-none cursor-default bg-transparent text-gray-600 border-0 rounded-full flex items-center justify-center hover:bg-gray-100 pressed:bg-gray-200 focus-visible:ring ring-violet-600/70 ring-offset-2">
-          <ChevronUpDownIcon size="XS" />
-        </Button>
-      </Group>
-      <MyPopover>
-        <Dialog className="p-6 text-gray-600">
-          <Calendar>
-            <header className="flex items-center gap-1 pb-4 px-1 w-full">
-              <Heading className="flex-1 font-semibold text-2xl ml-2" />
-              <RoundButton slot="previous">
-                <ChevronLeftIcon />
-              </RoundButton>
-              <RoundButton slot="next">
-                <ChevronRightIcon />
-              </RoundButton>
-            </header>
-            <CalendarGrid className="border-spacing-1 border-separate">
-              <CalendarGridHeader>
-                {(day) => (
-                  <CalendarHeaderCell className="text-xs text-gray-500 font-semibold">
-                    {day}
-                  </CalendarHeaderCell>
-                )}
-              </CalendarGridHeader>
-              <CalendarGridBody>
-                {(date) => (
-                  <CalendarCell
-                    date={date}
-                    className="w-9 h-9 outline-none cursor-default rounded-full flex items-center justify-center outside-month:text-gray-300 hover:bg-gray-100 pressed:bg-gray-200 selected:bg-violet-700 selected:text-white focus-visible:ring ring-violet-600/70 ring-offset-2"
-                  />
-                )}
-              </CalendarGridBody>
-            </CalendarGrid>
-          </Calendar>
-        </Dialog>
-      </MyPopover>
-    </DatePicker>
+    <Card>
+      <HStack>
+        <Text>Pick a date or date range: </Text>
+        <CalendarDateRangePicker/>
+      </HStack>
+    </Card>
   )
 }
 
-function RoundButton(props: ButtonProps) {
-  return (
-    <Button
-      {...props}
-      className="w-9 h-9 outline-none cursor-default bg-transparent text-gray-600 border-0 rounded-full flex items-center justify-center hover:bg-gray-100 pressed:bg-gray-200 focus-visible:ring-2 ring-violet-600/70 ring-offset-2"
-    />
-  );
-}
 
-function MyPopover(props: PopoverProps) {
-  return (
-    <Popover
-      {...props}
-      className={({ isEntering, isExiting }) => `
-        overflow-auto rounded-lg drop-shadow-lg ring-1 ring-black/10 bg-white
-        ${
-        isEntering
-          ? 'animate-in fade-in placement-bottom:slide-in-from-top-1 placement-top:slide-in-from-bottom-1 ease-out duration-200'
-          : ''
-      }
-        ${
-        isExiting
-          ? 'animate-out fade-out placement-bottom:slide-out-to-top-1 placement-top:slide-out-to-bottom-1 ease-in duration-150'
-          : ''
-      }
-      `}
-    />
-  );
-}
 
 interface DateRange {
-  startDay: number
-  startMonth: number
-  startYear: number
-  endDay: number
-  endMonth: number
-  endYear: number
+  start: DateValue
+  end: DateValue
 }
 
 interface TimeRange {
@@ -256,7 +193,7 @@ function Day({ day }: { day: string }) {
           />
         </Box>
       ))}
-      <ChakraButton colorScheme='blue' onClick={addTimeRange}>Add time range</ChakraButton>
+      <Button colorScheme='blue' onClick={addTimeRange}>Add time range</Button>
     </Card>
   )
 }
@@ -290,7 +227,7 @@ function TimeRange({
           period={range.endPeriod}
           onChange={(field, value) => onTimeChange(`end${field}`, value)}
         />
-        <ChakraButton colorScheme='red' onClick={onRemove}>Remove</ChakraButton>
+        <Button colorScheme='red' onClick={onRemove}>Remove</Button>
       </HStack>
     </Box>
   )
