@@ -1,26 +1,34 @@
 {
   "compilerOptions": {
     "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
-    "incremental": true,
+    "allowJs": true, // Allow JavaScript files to be compiled.
+    "skipLibCheck": true, // Skip type checking of declaration files.
+    "strict": true, // Enable all strict type-checking options.
+    "noEmit": true, // Do not emit outputs.
+    "esModuleInterop": true, // Enable `esModuleInterop` for compatibility.
+    "module": "esnext", // Use ESNext module system.
+    "moduleResolution": "bundler", // Use module resolution method for bundlers like webpack.
+    "resolveJsonModule": true, // Allow importing JSON modules.
+    "isolatedModules": true, // Ensure each file can be compiled independently.
+    "jsx": "preserve", // Preserve JSX syntax for further processing.
+    "incremental": true, // Enable incremental compilation.
     "plugins": [
       {
-        "name": "next"
+        "name": "next" // Next.js plugin for better integration.
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"] // Path alias for better imports.
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.js", // Ensure JS files are included.
+    "**/*.jsx", // Ensure JSX files are included.
+    ".next/types/**/*.ts",
+    "src/**/*"
+  ],
   "exclude": ["node_modules"]
 }

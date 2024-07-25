@@ -19,8 +19,8 @@ import {
   NumberIncrementStepper,
   NumberDecrementStepper,
 } from '@chakra-ui/react'
-import CalendarDatePicker, { getDatesBetween } from '../components/CalendarDatePicker'
-import CalendarDateRangePicker from '../components/CalendarDateRangePicker'
+import CalendarRangePicker from '../components/CalendarRangePicker.jsx'
+import { DateField, StyledField, TimeField } from "../components/calendar_components/DateField";
 import { DateValue } from 'react-aria-components'
 
 export default function CreatePage() {
@@ -88,6 +88,7 @@ function General() {
 
 function Specific() {
   const [selectedDays, setSelectedDays] = useState<string[]>([])
+  const [num, setNum] = useState<number>(1)
 
   const handleSelectedDaysChange = (day: string) => {
     setSelectedDays(prev =>
@@ -95,11 +96,17 @@ function Specific() {
     )
   }
 
+  const handleAddDateOrDateRange = () => {
+    setNum(prev => prev + 1);
+  }
+
   return (
     <Box mt={4}>
-      <Button>Add date or date range</Button>
+      <Button onClick={handleAddDateOrDateRange}>Add date or date range</Button>
 
-      <DateRangePicker/>
+      {Array.from({ length: num }).map((_, index) => (
+        <DateRange key={index} />
+      ))}
 
       {selectedDays.map((day) => (
         <Day key={day} day={day} />
@@ -108,44 +115,14 @@ function Specific() {
   )
 }
 
-function DateRangePicker() {
-  const [isRange, setIsRange] = useState<boolean>(false)
-  const [dateRange, setDateRange] = useState<DateRange | null>(null)
-
-  const handleIsRangeChange = () => {
-    setIsRange(!isRange)
-  }
-
-  const handleDateRangeChange = (sideOfRange: 'start' | 'end', date: DateValue) => {
-    setDateRange(prev => {
-      if (!prev) {
-        // Initialize dateRange if it was null
-        return {
-          start: date,
-          end: date
-        }
-      }
-      return {
-        ...prev,
-        [sideOfRange]: date
-      }
-    })
-  }
-
-  // Function to get all dates between start and end
-  const getDates = dateRange ? getDatesBetween(dateRange.start, dateRange.end) : [];
-
+function DateRange() {
   return (
     <Card>
-      <HStack>
-        <Text>Pick a date or date range: </Text>
-        <CalendarDateRangePicker/>
-      </HStack>
+      <CalendarRangePicker/>
+      <Day day='placeholder day name'></Day>
     </Card>
   )
 }
-
-
 
 interface DateRange {
   start: DateValue
