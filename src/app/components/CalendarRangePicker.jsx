@@ -40,7 +40,7 @@ export default function CalendarRangePicker(props) {
             –
           </Box>
           <DateField {...endFieldProps} />
-          {state.validationState === "invalid" && (
+          {state.isInvalid && (
             <NotAllowedIcon color="red.600" position="absolute" right="12" />
           )}
         </StyledField>

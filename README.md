@@ -7,6 +7,14 @@ Code from:
 https://react-spectrum.adobe.com/react-aria/examples/datepicker.html  
 https://codesandbox.io/s/white-breeze-rer8g2?file=/src/App.js  
 
+Sources:
+https://react-spectrum.adobe.com/react-aria/hooks.html  
+https://react-spectrum.adobe.com/react-stately/index.html  
+
+Project Notes:
+The issue occurs because Chakra UI components are not directly compatible with the useRef typing. Workaround using as any: `<ChakraBox {...groupProps} ref={ref as any}`
+
+
 
 ## Getting Started
 

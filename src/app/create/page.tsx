@@ -20,8 +20,8 @@ import {
   NumberDecrementStepper,
 } from '@chakra-ui/react'
 import CalendarRangePicker from '../components/CalendarRangePicker.jsx'
-import { DateField, StyledField, TimeField } from "../components/calendar_components/DateField";
 import { DateValue } from 'react-aria-components'
+import { TimeRangePicker } from '../components/TimeRangePicker.js'
 
 export default function CreatePage() {
   const [eventType, setEventType] = useState<string>('specific')
@@ -183,14 +183,12 @@ interface TimeRangeProps {
 }
 
 function TimeRange({
-  range,
-  onTimeChange,
   onRemove
 }: TimeRangeProps) {
   return (
     <Box>
       <HStack spacing={2} mb={2}>
-        <Text>Start of range: </Text>
+        {/* <Text>Start of range: </Text>
         <TimeSelect
           hour={range.startHour}
           minute={range.startMinute}
@@ -203,46 +201,10 @@ function TimeRange({
           minute={range.endMinute}
           period={range.endPeriod}
           onChange={(field, value) => onTimeChange(`end${field}`, value)}
-        />
+        /> */}
+        <TimeRangePicker></TimeRangePicker>
         <Button colorScheme='red' onClick={onRemove}>Remove</Button>
       </HStack>
     </Box>
-  )
-}
-
-
-interface TimeSelectProps {
-  hour: number
-  minute: number
-  period: 'am' | 'pm'
-  onChange: (field: 'Hour' | 'Minute' | 'Period', value: number | 'am' | 'pm') => void
-}
-
-function TimeSelect({ hour, minute, period, onChange }: TimeSelectProps) {
-  return (
-    <HStack spacing={1}>
-      <NumberInput
-        value={hour}
-        min={1} max={12}
-        onChange={(value) => onChange('Hour', parseInt(value))}
-      >
-        <NumberInputField />
-      </NumberInput>
-      <Text>:</Text>
-      <NumberInput
-        value={minute}
-        min={0} max={59}
-        onChange={(value) => onChange('Minute', parseInt(value))}
-      >
-        <NumberInputField />
-      </NumberInput>
-      <Select
-        value={period}
-        onChange={(e) => onChange('Period', e.target.value as 'am' | 'pm')}
-      >
-        <option value='am'>AM</option>
-        <option value='pm'>PM</option>
-      </Select>
-    </HStack>
   )
 }
