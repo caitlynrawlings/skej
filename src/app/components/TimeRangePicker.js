@@ -18,16 +18,6 @@ export function TimeRangePicker(props) {
         ref
     );
 
-    // Update start time by updating the selected range
-    const handleStartChange = (value) => {
-        state.setSelectedRange({ start: value, end: state.end });
-    };
-
-    // Update end time by updating the selected range
-    const handleEndChange = (value) => {
-        state.setSelectedRange({ start: state.start, end: value });
-    };
-
     return (
         <ChakraBox {...groupProps} ref={ref} display="flex" gap="2">
             <TimeField

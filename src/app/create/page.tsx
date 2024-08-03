@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from 'react'
+import {Time} from '@internationalized/date';
 import { useState, ChangeEvent } from 'react'
 import {
   Flex, 
@@ -20,7 +21,7 @@ import {
   NumberDecrementStepper,
 } from '@chakra-ui/react'
 import CalendarRangePicker from '../components/CalendarRangePicker.jsx'
-import { DateValue } from 'react-aria-components'
+import { TimeValue } from 'react-aria-components'
 import { TimeRangePicker } from '../components/TimeRangePicker.js'
 
 export default function CreatePage() {
@@ -87,14 +88,7 @@ function General() {
 }
 
 function Specific() {
-  const [selectedDays, setSelectedDays] = useState<string[]>([])
   const [num, setNum] = useState<number>(1)
-
-  const handleSelectedDaysChange = (day: string) => {
-    setSelectedDays(prev =>
-      prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
-    )
-  }
 
   const handleAddDateOrDateRange = () => {
     setNum(prev => prev + 1);
@@ -105,17 +99,13 @@ function Specific() {
       <Button onClick={handleAddDateOrDateRange}>Add date or date range</Button>
 
       {Array.from({ length: num }).map((_, index) => (
-        <DateRange key={index} />
-      ))}
-
-      {selectedDays.map((day) => (
-        <Day key={day} day={day} />
+        <CalendarRange key={index} />
       ))}
     </Box>
   )
 }
 
-function DateRange() {
+function CalendarRange() {
   return (
     <Card>
       <CalendarRangePicker/>
@@ -124,87 +114,32 @@ function DateRange() {
   )
 }
 
-interface DateRange {
-  start: DateValue
-  end: DateValue
-}
-
-interface TimeRange {
-  startHour: number
-  startMinute: number
-  endHour: number
-  endMinute: number
-  startPeriod: 'am' | 'pm'
-  endPeriod: 'am' | 'pm'
-}
-
 function Day({ day }: { day: string }) {
-  const [timeRanges, setTimeRanges] = useState<TimeRange[]>([])
+  const [timeRanges, setTimeRanges] = useState<TimeRange[]>([{start: new Time(0, 0), end: new Time(0, 0)}])
 
   const addTimeRange = () => {
-    setTimeRanges(prev => [...prev, { startHour: 12, startMinute: 0, endHour: 12, endMinute: 0, startPeriod: 'am', endPeriod: 'am' }])
+    setTimeRanges(prev => [...prev, {start: new Time(0, 0), end: new Time(0, 0)}])
   }
 
   const removeTimeRange = (index: number) => {
     setTimeRanges(prev => prev.filter((_, i) => i !== index))
   }
 
-  const handleTimeChange = (index: number, field: 'startHour' | 'startMinute' | 'endHour' | 'endMinute' | 'startPeriod' | 'endPeriod', value: number | 'am' | 'pm') => {
-    setTimeRanges(prev => {
-      const updatedRanges = [...prev]
-      // Correctly map field names to those used in the TimeRange interface
-      updatedRanges[index] = { ...updatedRanges[index], [field]: value }
-      return updatedRanges
-    })
-  }
-
   return (
     <Card p={4} mb={4}>
       <Text mb={2}>Select times that work for {day}</Text>
       {timeRanges.map((range, index) => (
-        <Box key={index} mb={2}>
-          <TimeRange
-            range={range}
-            onTimeChange={(field, value) => handleTimeChange(index, field, value)}
-            onRemove={() => removeTimeRange(index)}
-          />
-        </Box>
+        <HStack spacing={2} mb={2}>
+          <TimeRangePicker></TimeRangePicker>
+          <Button colorScheme='red' onClick={() => removeTimeRange(index)}>Remove</Button>
+        </HStack>
       ))}
       <Button colorScheme='blue' onClick={addTimeRange}>Add time range</Button>
     </Card>
   )
 }
 
-
-interface TimeRangeProps {
-  range: TimeRange
-  onTimeChange: (field: 'startHour' | 'startMinute' | 'endHour' | 'endMinute' | 'startPeriod' | 'endPeriod', value: number | 'am' | 'pm') => void
-  onRemove: () => void
-}
-
-function TimeRange({
-  onRemove
-}: TimeRangeProps) {
-  return (
-    <Box>
-      <HStack spacing={2} mb={2}>
-        {/* <Text>Start of range: </Text>
-        <TimeSelect
-          hour={range.startHour}
-          minute={range.startMinute}
-          period={range.startPeriod}
-          onChange={(field, value) => onTimeChange(`start${field}`, value)}
-        />
-        <Text>End of range: </Text>
-        <TimeSelect
-          hour={range.endHour}
-          minute={range.endMinute}
-          period={range.endPeriod}
-          onChange={(field, value) => onTimeChange(`end${field}`, value)}
-        /> */}
-        <TimeRangePicker></TimeRangePicker>
-        <Button colorScheme='red' onClick={onRemove}>Remove</Button>
-      </HStack>
-    </Box>
-  )
+interface TimeRange {
+  start: TimeValue;
+  end: TimeValue;
 }

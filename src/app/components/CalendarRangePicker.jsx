@@ -54,18 +54,6 @@ export default function CalendarRangePicker(props) {
         <Popover triggerRef={ref} state={state} placement="bottom start">
           <Dialog {...dialogProps}>
             <RangeCalendar {...calendarProps} />
-            <Box display="flex" gap="2">
-              <TimeField
-                label="Start time"
-                value={state.timeRange?.start || null}
-                onChange={(v) => state.setTime("start", v)}
-              />
-              <TimeField
-                label="End time"
-                value={state.timeRange?.end || null}
-                onChange={(v) => state.setTime("end", v)}
-              />
-            </Box>
           </Dialog>
         </Popover>
       )}
